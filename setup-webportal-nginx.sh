@@ -101,68 +101,21 @@ setup_project_files() {
     # Ensure target directory exists
     mkdir -p "$TARGET_DIR"
     
-    # Check if we're running from within the project directory
-    local source_candidates=(
-        "."                              # Current directory
-        "$(pwd)"                         # Current working directory
-        "/home/$(logname)/webportal-Arga" 2>/dev/null  # User's home directory
-        "/tmp/webportal-Arga"            # Temp directory
-        "/opt/webportal-Arga"            # Common app directory
-    )
+    # Copy project files from current directory to target directory
+    local current_dir="$(pwd)"
     
-    local found_source=""
-    
-    # Look for project files in candidate directories
-    for candidate in "${source_candidates[@]}"; do
-        if [ -d "$candidate" ] && [ -f "$candidate/index.php" ]; then
-            # Check if this looks like our project
-            if [ -d "$candidate/arga" ] || [ -d "$candidate/assets" ] || [ -d "$candidate/sistem" ]; then
-                found_source="$candidate"
-                print_status "Found project files in: $found_source"
-                break
-            fi
-        fi
-    done
-    
-    if [ -n "$found_source" ] && [ "$found_source" != "$TARGET_DIR" ]; then
-        print_status "Copying project files from $found_source to $TARGET_DIR..."
-        cp -r "$found_source"/* "$TARGET_DIR/" 2>/dev/null || true
+    if [ "$current_dir" != "$TARGET_DIR" ]; then
+        print_status "Copying project files from current directory to $TARGET_DIR..."
+        cp -r ./* "$TARGET_DIR/" 2>/dev/null || true
         
         # Verify copy was successful
         if [ -f "$TARGET_DIR/index.php" ]; then
             print_status "Project files copied successfully"
         else
-            print_warning "Copy may have failed, some files might be missing"
+            print_warning "index.php not found - please ensure you're running this script from your project directory"
         fi
-    elif [ -f "$TARGET_DIR/index.php" ]; then
-        print_status "Project files already exist in target directory"
     else
-        print_warning "Project files not found in common locations"
-        print_status "Please ensure your project files are available in one of these locations:"
-        print_status "- Current directory (where you run this script)"
-        print_status "- /home/$(logname)/webportal-Arga"
-        print_status "- $TARGET_DIR"
-        
-        # Create basic directory structure as fallback
-        mkdir -p "$TARGET_DIR"/{arga,assets,css,Dokumen,image,js,sistem}
-        
-        # Create a basic index.php
-        cat > "$TARGET_DIR/index.php" << 'EOF'
-<?php
-echo "<h1>webportal-Arga Server Setup Complete</h1>";
-echo "<p>Server configuration successful!</p>";
-echo "<p><strong>Next steps:</strong></p>";
-echo "<ul>";
-echo "<li>Upload your project files to: " . __DIR__ . "</li>";
-echo "<li>Replace this placeholder index.php with your actual project</li>";
-echo "<li>Ensure all files have proper permissions</li>";
-echo "</ul>";
-echo "<hr>";
-echo "<h2>Server Information:</h2>";
-phpinfo();
-?>
-EOF
-        print_warning "Created placeholder structure - please upload your actual project files"
+        print_status "Already running from target directory"
     fi
     
     # Create expected directories if missing
