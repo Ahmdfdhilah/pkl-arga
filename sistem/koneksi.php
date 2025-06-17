@@ -1,8 +1,8 @@
 <?php
 function open_connection() {
     $hostname = "localhost";
-    $username = "root";
-    $password = ""; // Sesuaikan dengan password database MySQL Anda
+    $username = "webuser";
+    $password = "password123"; // Sesuaikan dengan password database MySQL Anda
     $dbname = "argapkl"; // Sesuaikan nama database Anda
 
     // Set mysqli to report errors

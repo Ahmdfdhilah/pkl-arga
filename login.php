@@ -2,8 +2,15 @@
 session_start();
 
 include 'sistem/koneksi.php';
-$conn = open_connection();
 
+// Debug info
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+echo "Current user: " . get_current_user() . "<br>";
+echo "PHP SAPI: " . php_sapi_name() . "<br>";
+
+$conn = open_connection();
 
 // Cek koneksi
 if (!$conn) {
