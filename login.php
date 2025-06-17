@@ -1,17 +1,13 @@
 <?php
 session_start();
 
-include '../webportal-Arga/sistem/koneksi.php';
+include 'sistem/koneksi.php';
 $conn = open_connection();
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "webportal-arga";
 
 // Cek koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+if (!$conn) {
+    die("Koneksi gagal: Database tidak dapat terhubung");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -20,19 +16,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Query untuk memeriksa email dan password
     $sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $email, $password);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = mysqli_prepare($conn, $sql);
+    
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "ss", $email, $password);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-    if ($result->num_rows > 0) {
-        // Set session dan redirect ke a_home.php
-        $_SESSION['loggedin'] = true;
-        header("Location: a_home.php");
-        exit;
+        if (mysqli_num_rows($result) > 0) {
+            // Set session dan redirect ke a_home.php
+            $_SESSION['loggedin'] = true;
+            header("Location: a_home.php");
+            exit;
+        } else {
+            $error = "Email atau password salah!";
+        }
+        
+        mysqli_stmt_close($stmt);
     } else {
-        $error = "Email atau password salah!";
+        $error = "Terjadi kesalahan sistem: " . mysqli_error($conn);
     }
+    
+    mysqli_close($conn);
 }
 ?>
 

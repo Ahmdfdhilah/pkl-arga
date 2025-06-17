@@ -5,13 +5,36 @@ function open_connection() {
     $password = ""; // Sesuaikan dengan password database MySQL Anda
     $dbname = "argapkl"; // Sesuaikan nama database Anda
 
-    $koneksi = mysqli_connect($hostname, $username, $password, $dbname);
-
-    // Cek koneksi
-    if (!$koneksi) {
-        die("Koneksi gagal: " . mysqli_connect_error());
+    // Set mysqli to report errors
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    
+    try {
+        $koneksi = mysqli_connect($hostname, $username, $password, $dbname);
+        
+        // Set charset untuk menghindari masalah encoding
+        mysqli_set_charset($koneksi, "utf8");
+        
+        return $koneksi;
+        
+    } catch (mysqli_sql_exception $e) {
+        error_log("Database connection failed: " . $e->getMessage());
+        echo "Koneksi database gagal: " . $e->getMessage();
+        return false;
     }
+}
 
-    return $koneksi;
+// Fungsi untuk test koneksi sederhana
+function test_connection() {
+    $koneksi = open_connection();
+    
+    if ($koneksi) {
+        $result = mysqli_query($koneksi, "SELECT 1");
+        if ($result) {
+            mysqli_close($koneksi);
+            return true;
+        }
+    }
+    
+    return false;
 }
 ?>
