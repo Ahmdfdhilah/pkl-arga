@@ -79,19 +79,89 @@ create_directories() {
 # Update system packages
 update_system() {
     print_status "Updating system packages..."
-    apt update && apt upgrade -y
+    # apt update && apt upgrade -y
+}
+
+# Detect available PHP version
+detect_php_version() {
+    print_status "Detecting available PHP version..."
+    
+    # Check for PHP versions in order of preference
+    for version in "8.3" "8.2" "8.1" "8.0" "7.4"; do
+        if apt-cache show php${version}-fpm >/dev/null 2>&1; then
+            PHP_VERSION="$version"
+            print_status "Found PHP $PHP_VERSION"
+            return 0
+        fi
+    done
+    
+    # If no specific version found, try to use default php-fpm
+    if apt-cache show php-fpm >/dev/null 2>&1; then
+        PHP_VERSION=""
+        print_status "Using default PHP version"
+        return 0
+    fi
+    
+    print_error "No PHP-FPM package found. Adding PHP repository..."
+    
+    # Add PHP repository
+    apt install -y software-properties-common
+    add-apt-repository ppa:ondrej/php -y
+    apt update
+    
+    # Try again with 8.2
+    if apt-cache show php8.2-fpm >/dev/null 2>&1; then
+        PHP_VERSION="8.2"
+        print_status "Found PHP 8.2 after adding repository"
+    else
+        print_error "Still can't find PHP packages. Please check your system."
+        exit 1
+    fi
 }
 
 # Install required packages
 install_packages() {
     print_status "Installing Nginx, PHP-FPM, and Certbot..."
-    apt install -y nginx php${PHP_VERSION}-fpm php${PHP_VERSION}-mysql php${PHP_VERSION}-curl php${PHP_VERSION}-gd php${PHP_VERSION}-mbstring php${PHP_VERSION}-xml php${PHP_VERSION}-zip php${PHP_VERSION}-intl php${PHP_VERSION}-bcmath
+    
+    # Detect PHP version first
+    detect_php_version
+    
+    # Install packages based on detected PHP version
+    if [ -n "$PHP_VERSION" ]; then
+        print_status "Installing PHP $PHP_VERSION packages..."
+        apt install -y nginx \
+            php${PHP_VERSION}-fpm \
+            php${PHP_VERSION}-mysql \
+            php${PHP_VERSION}-curl \
+            php${PHP_VERSION}-gd \
+            php${PHP_VERSION}-mbstring \
+            php${PHP_VERSION}-xml \
+            php${PHP_VERSION}-zip \
+            php${PHP_VERSION}-intl \
+            php${PHP_VERSION}-bcmath \
+            php${PHP_VERSION}-cli
+    else
+        print_status "Installing default PHP packages..."
+        apt install -y nginx \
+            php-fpm \
+            php-mysql \
+            php-curl \
+            php-gd \
+            php-mbstring \
+            php-xml \
+            php-zip \
+            php-intl \
+            php-bcmath \
+            php-cli
+    fi
     
     # Install Certbot for SSL certificates
     if [ "$USE_SSL" = true ]; then
         apt install -y certbot python3-certbot-nginx
         print_status "Certbot installed successfully"
     fi
+    
+    print_status "All packages installed successfully"
 }
 
 # Setup project files
