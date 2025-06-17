@@ -238,7 +238,7 @@
     <img src="image/struktur bagan.jpg" alt="Berkelanjutan" class="struktur-bagan">
     <div class="org-chart">
       <?php
-      include '../webportal-Arga/sistem/koneksi.php';
+      include_once 'sistem/koneksi.php';
       $conn = open_connection();
 
       // Fetch and display data

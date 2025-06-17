@@ -1,5 +1,5 @@
 <?php
-include '../webportal-Arga/sistem/koneksi.php';
+include_once 'sistem/koneksi.php';
 $conn = open_connection();
 
 // Handle form submission

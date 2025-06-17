@@ -427,7 +427,7 @@
     <h2><span>ABOUT US</span><br>PT. ARGA BUMI INDONESIA</h2>
     <div class="about-list">
         <?php
-            include '../webportal-Arga/sistem/koneksi.php';
+            include_once 'sistem/koneksi.php';
             $conn = open_connection();
 
             $result = mysqli_query($conn, "SELECT * FROM about_us");
@@ -458,7 +458,7 @@
     <p class="subheading">Visi</p>
     <ul class="misi-list">
         <?php
-        include_once '../webportal-Arga/sistem/koneksi.php';
+        include_once 'sistem/koneksi.php';
         $conn = open_connection();
         
         // Fetch Visi
@@ -474,7 +474,7 @@
     <p class="subheading">Misi</p>
     <ul class="misi-list">
         <?php
-        include_once '../webportal-Arga/sistem/koneksi.php';
+        include_once 'sistem/koneksi.php';
         $conn = open_connection();
         
         // Fetch Misi
@@ -494,7 +494,7 @@
         <h2><span>VALUE</span><br>PT. ARGA BUMI INDONESIA</h2> <br>
         <div class="value-cards">
             <?php
-            include_once '../webportal-Arga/sistem/koneksi.php';
+            include_once 'sistem/koneksi.php';
             $conn = open_connection();
 
             $result = mysqli_query($conn, "SELECT * FROM values_table");

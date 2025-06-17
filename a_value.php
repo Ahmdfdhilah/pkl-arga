@@ -1,5 +1,5 @@
 <?php
-include '../webportal-Arga/sistem/koneksi.php';
+include_once 'sistem/koneksi.php';
 $conn = open_connection();
 // Handle form submission for adding data
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['edit_id'])) {
